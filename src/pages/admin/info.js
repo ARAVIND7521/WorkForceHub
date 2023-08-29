@@ -57,7 +57,7 @@ function Info() {
         IMAGESIZE: "File size exceeds the limit (2MB).",
         IMAGEONLY: "Only image files (JPEG, PNG, GIF, WEBP) are allowed."
     };
-    console.log(Age);
+
     let formattedExperience =
         years > 0
             ? `${years} ${years === 1 ? 'YEAR' : 'YEARS'}`
@@ -99,7 +99,6 @@ function Info() {
                 'Content-Type': 'application/json'
             }
         }).then((response => {
-            console.log(response);
             const data = response.data[0];
             setEmpID(data.EmpID);
             setFirstname(data.First_Name);
@@ -361,7 +360,7 @@ function Info() {
                     </div>
                     <div id='name'>
                         <label htmlFor="dob">DOB</label>
-                        <input disabled ref={ref_dob} id="dob" className="form" type="date" onKeyUp={AgeCalculator} onChange={(e) => setDOB(e.target.value)} value={DOB} name="dob" placeholder="DD-MM-YYYY"></input>
+                        <input disabled ref={ref_dob} id="dob" className="form" type="date" onInput={AgeCalculator} onChange={(e) => setDOB(e.target.value)} value={DOB} name="dob" placeholder="DD-MM-YYYY"></input>
                     </div>
                     {renderErrorMessage("DOB")}
                     <div id='name'>

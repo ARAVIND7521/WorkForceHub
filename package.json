@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://aravind7521.github.io/WorkForceHub/",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -34,7 +33,6 @@
     "webpack-dev-server": "^4.15.0"
   },
   "scripts": {
-    "deploy": "gh-pages -d build",
     "serve": "webpack serve --mode development",
     "start": "react-scripts start",
     "build": "react-scripts build",
