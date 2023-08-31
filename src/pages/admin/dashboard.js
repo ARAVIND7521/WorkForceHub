@@ -326,12 +326,10 @@ function Dashboard() {
                                 minDate={new Date(1990, 1, 1)}
                                 value={date} onClickDay={(clickedDate, event) => handleDateClick(clickedDate, event)}
                             />
-                            {/* <div ref={ref_tooltipHeader} className="tooltip-container"> */}
                             <div ref={ref_tooltip} className="tooltip-content" style={{ top: tooltipPosition.y, left: tooltipPosition.x }}>
                                 <button ref={ref_tooltip_button1} onClick={() => { handleStatusChange("Present") }}>Present ({membersPresent})</button>
                                 <button ref={ref_tooltip_button2} onClick={() => { handleStatusChange("Absent") }}>Leave ({membersAbsent})</button>
                             </div>
-                            {/* </div> */}
                         </div>
                     </div>
                     <div id="dashborad">
@@ -357,11 +355,11 @@ function Dashboard() {
                                 })
                             }
                         </div>
-                        <div id="employeeCount">
+                        <div id="employeeCount" onClick={Show_details}>
                             <h2>Number of employee's</h2>
-                            <div id="countContainer" onClick={Show_details}>
+                            <div id="countContainer">
                                 <h3 id="count">{userData.length}</h3>
-                                <div id="arrowIcon">&#9658;</div>
+                                {/* <div id="arrowIcon">&#9658;</div> */}
                             </div>
                         </div>
                     </div>

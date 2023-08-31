@@ -62,7 +62,7 @@ function AddShow() {
     const months = Math.round((Experience - years) * 12);
     // my1stcompany2001@gmail.com
     const errors = {
-        AGE: "Invalid age",
+        AGE: "Age is above 18",
         FIRSTNAME: "ENTER THE FIRST NAME!",
         LASTNAME: "ENTER THE LAST NAME!",
         DOB: "ENTER VALID DOB!",
@@ -174,12 +174,22 @@ function AddShow() {
         setErrorMessages({ name: "DATA", message: errors.NULL });
     }
 
-    function Data() {
+    function handleAutopick(newEmpID) {
+        setEmployeeID(newEmpID);
+        Data(newEmpID);
+    }
+
+    function Data(employeeID) {
         axios.post('http://localhost:3000/dashboard/', {
             empid: employeeID,
-        }).then((response => setInfo(response.data)))
-            .catch(handleAxiosError);
+        }).then((response => {
+            setInfo(response.data);
+            filter(response.data, employeeID);
+        })).catch(handleAxiosError);
         setErrorMessages({ name: "DATA2", message: errors.NULL });
+    }
+
+    function filter(info, employeeID) {
         for (let data in info) {
             if (employeeID == info[data].EmpID) {
                 setErrorMessages({ name: "DATA2", message: errors.NULL });
@@ -188,6 +198,7 @@ function AddShow() {
                 setDOB(moment(info[data].DOB).format('YYYY-MM-DD'))
                 setExperience(info[data].Experience);
                 setDesignation(info[data].Designation);
+                setAge(info[data].Age);
                 setDOJ(moment(info[data].DOJ).format('YYYY-MM-DD'));
                 setAddress(info[data].Address);
                 setZipcode(info[data].Zipcode);
@@ -254,7 +265,12 @@ function AddShow() {
         }
     }
 
-    function AgeCalculator() {
+    function handleDOBChange(newDOB) {
+        setDOB(newDOB);
+        AgeCalculator(newDOB);
+    }
+
+    function AgeCalculator(DOB) {
         let dob = new Date(DOB);
         let month_diff = Date.now() - dob.getTime();
         let age_dt = new Date(month_diff);
@@ -396,8 +412,8 @@ function AddShow() {
                 const btn1 = ref_success_ok.current;
                 btn1.onclick = function () {
                     modal1.style.display = "none";
+                    window.location.reload(false);
                 }
-                window.location.reload(false);
                 Reset();
             }).catch(handleAxiosError);
         }
@@ -432,7 +448,7 @@ function AddShow() {
                             </div>
                             <div id='name'>
                                 <label htmlFor="empid">Emp ID</label>
-                                <input className="form1 employeeID" type="number" onWheel={e => { e.target.blur() }} onKeyUp={() => { Data() }} onChange={(e) => setEmployeeID(e.target.value)} value={employeeID} name="ID" placeholder="Emp ID"></input>
+                                <input className="form1 employeeID" type="number" onWheel={e => { e.target.blur() }} onChange={(e) => handleAutopick(e.target.value)} value={employeeID} name="ID" placeholder="Emp ID"></input>
                                 {renderErrorMessage("DATA2")}
                             </div>
                             <div id="Employees_display">
@@ -590,7 +606,7 @@ function AddShow() {
                             </div>
                             <div id='name'>
                                 <label htmlFor="dob">DOB</label>
-                                <input id="dob" ref={ref_DOB} className="form" type="date" onInput={AgeCalculator} onChange={(e) => setDOB(e.target.value)} max={currentDate} value={DOB} name="dob"></input>
+                                <input id="dob" ref={ref_DOB} className="form" type="date" onChange={(e) => handleDOBChange(e.target.value)} max={currentDate} value={DOB} name="dob"></input>
                                 {renderErrorMessage("DOB")}
                                 {renderErrorMessage("DATA")}
                             </div>

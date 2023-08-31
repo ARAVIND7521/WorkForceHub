@@ -104,7 +104,8 @@ function Attendance() {
         setMode("");
         setDay("");
         setToDate("");
-        window.location.reload(false);
+        setSearchQuery("");
+        editName();
     }
 
     function handleSubmit(event) {
@@ -122,25 +123,26 @@ function Attendance() {
         }
     }
 
-    function Autopick() {
+    function Autopick(name) {
         Axios.post('http://localhost:3000/dashboard/', {
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then((response => {
             setInfo(response.data);
-            const filterList = ref_lists.current;
-            filterList.style.display = "block";
+            filter(response.data, name);
         })).catch(handleAxiosError);
+    }
 
-        const filteredEmployees = info.filter((employee) =>
-            employee.EmpID.toString().includes(searchQueryLower) || employee.First_Name.toLowerCase().includes(searchQuery.toLowerCase()) || employee.Last_Name.toLowerCase().includes(searchQuery.toLowerCase())
+    function filter(data, name) {
+        const filteredEmployees = data.filter((employee) =>
+            employee.EmpID.toString().includes(name.toLowerCase()) || employee.First_Name.toLowerCase().includes(name.toLowerCase()) || employee.Last_Name.toLowerCase().includes(name.toLowerCase())
         );
-
         setFilteredEmployees(filteredEmployees);
-        if (filteredEmployees.length === info.length || filteredEmployees.length === null) {
+        if (filteredEmployees.length === data.length || filteredEmployees.length === null) {
             setErrorMessages({ name: "EmpName", message: errors.null });
         } else if (filteredEmployees.length === 0) {
+
             setErrorMessages({ name: "EmpName", message: errors.empID });
             setEmpID("");
             setDesignation("");
@@ -153,8 +155,9 @@ function Attendance() {
         }
     }
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+    const handleSearchChange = (newData) => {
+        setSearchQuery(newData);
+        Autopick(newData);
     };
 
     const handleEmployeeSelect = (employee) => {
@@ -351,7 +354,7 @@ function Attendance() {
                 </div>
                 <div ref={ref_date} className="modal">
                     <div className="modal-content">
-                        <p>Invalid date! Enter the current date and month or Already exists!</p>
+                        <p>Attendance already available!</p>
                         <button ref={ref_date_ok} id="ok_date" className="button_hide">ok</button>
                     </div>
                 </div>
@@ -368,8 +371,7 @@ function Attendance() {
                                     className='form'
                                     type='text'
                                     onWheel={e => { e.target.blur() }}
-                                    onKeyUp={() => Autopick(searchQuery)}
-                                    onChange={handleSearchChange}
+                                    onChange={(e) => handleSearchChange(e.target.value)}
                                     value={searchQuery}
                                     placeholder='Search employee name or employee ID'
                                     name="ID"

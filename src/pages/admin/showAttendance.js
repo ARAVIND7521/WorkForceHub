@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom";
+import moment from "moment";
 import Axios from 'axios';
 import { useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
@@ -15,14 +15,13 @@ function ShowAttendance() {
     const [name, setName] = useState("");
     const [dateFrom, setDateFrom] = useState("");
     const [dateTo, setDateTo] = useState("");
-    const [mode, setMode] = useState(0);
+    const [mode, setMode] = useState("");
+    const [status, setStatus] = useState("");
     const [empid, setEmpid] = useState("");
     const [errorMessages, setErrorMessages] = useState({});
     const ref_dashboard = useRef(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredEmployees, setFilteredEmployees] = useState([]);
-    const [selectedEmployee, setSelectedEmployee] = useState(null);
-    const [activeModeKey, setActiveModeKey] = useState("0");
     // const searchQueryLower = searchQuery.toLowerCase();
     const ref_lists = useRef(null);
     const ref_lists_frame = useRef(null);
@@ -30,6 +29,7 @@ function ShowAttendance() {
     const acc_selector = useRef(null);
     const [isDataVisible, setDataVisible] = useState(false);
     const errors = {
+        DATA_PICK: "PICK ANY ONE",
         empID: "NO RECORD FOUND!",
         NULL: "",
         input: "EMPTY",
@@ -61,24 +61,23 @@ function ShowAttendance() {
         }
     }, []);
 
-    function Autopick() {
+    function Autopick(name) {
         Axios.post('http://localhost:3000/dashboard/', {
-            empid: empid,
             headers: {
                 'Content-Type': 'application/json'
             }
         }).then((response => {
             setInfo(response.data);
-            const filterList = ref_lists.current;
-            filterList.style.display = "block";
+            filter(response.data, name);
         })).catch(handleAxiosError);
+    }
 
-        const filteredEmployees = info.filter((employee) =>
-            employee.EmpID.toString().includes(searchQuery.toLowerCase()) || employee.First_Name.toLowerCase().includes(searchQuery.toLowerCase()) || employee.Last_Name.toLowerCase().includes(searchQuery.toLowerCase())
+    function filter(data, name) {
+        const filteredEmployees = data.filter((employee) =>
+            employee.EmpID.toString().includes(name.toLowerCase()) || employee.First_Name.toLowerCase().includes(name.toLowerCase()) || employee.Last_Name.toLowerCase().includes(name.toLowerCase())
         );
-
         setFilteredEmployees(filteredEmployees);
-        if (filteredEmployees.length === info.length || filteredEmployees.length === null) {
+        if (filteredEmployees.length === data.length || filteredEmployees.length === null) {
             setName("");
             setErrorMessages({ name: "EmpName", message: errors.NULL });
         } else if (filteredEmployees.length === 0) {
@@ -93,12 +92,12 @@ function ShowAttendance() {
         }
     }
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+    const handleSearchChange = (newData) => {
+        setSearchQuery(newData);
+        Autopick(newData);
     };
 
     const handleEmployeeSelect = (employee) => {
-        setSelectedEmployee(employee);
         setSearchQuery(employee.EmpID);
         setName(employee.First_Name + " " + employee.Last_Name);
         const filteList = ref_lists_frame.current;
@@ -107,15 +106,21 @@ function ShowAttendance() {
 
 
     function search() {
+        const filteList = ref_lists_frame.current;
         if (searchQuery == "" || name == "") {
             setErrorMessages({ name: "EmpName", message: errors.name });
         } else if (dateFrom == "" || dateTo == "") {
             setErrorMessages({ name: "name", message: errors.input });
+        } else if (filteList.style.display === "flex") {
+            setErrorMessages({ name: "EmpName", message: errors.DATA_PICK });
         } else {
-            if (mode == 0) {
+            filteList.style.display = "none"
+            if (mode) {
                 Axios.post('http://localhost:3000/show-all-attendance/', {
                     empid: searchQuery,
                     empname: name,
+                    mode: mode,
+                    status: status,
                     datefrom: dateFrom,
                     dateto: dateTo,
                     headers: {
@@ -128,10 +133,10 @@ function ShowAttendance() {
                     setErrorMessages({ name: "null", message: errors.NULL });
                 }).catch(handleAxiosError);
             } else {
-                Axios.post('http://localhost:3000/show_attendance/', {
+                Axios.post('http://localhost:3000/show-all-attendance/', {
                     empid: searchQuery,
                     empname: name,
-                    mode: mode,
+                    status: status,
                     datefrom: dateFrom,
                     dateto: dateTo,
                     headers: {
@@ -147,6 +152,19 @@ function ShowAttendance() {
         }
     }
 
+    function handleDelete(modeData) {
+        Axios.post('http://localhost:3000/delete_record/', {
+            empid: searchQuery,
+            empname: name,
+            date: moment(modeData[0].Date).format("YYYY-MM-DD"),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            search();
+        }).catch(handleAxiosError)
+    };
+
     function clear() {
         setSearchQuery("");
         setDateFrom("");
@@ -155,8 +173,7 @@ function ShowAttendance() {
         setErrorMessages({ name: "null", message: errors.NULL });
     }
 
-    const handleModeSelection = (modeKey) => {
-        setActiveModeKey(modeKey);
+    const handleModeSelection = () => {
         setDataVisible(!isDataVisible);
     };
 
@@ -177,7 +194,6 @@ function ShowAttendance() {
                                     <th>DESIGNATION</th>
                                     <th>DATE</th>
                                     <th>Status</th>
-                                    {/* <th>MODE</th> */}
                                 </tr>
                             </tbody>
                             <tbody>
@@ -187,8 +203,11 @@ function ShowAttendance() {
                                         <td>{item.EmpName}</td>
                                         <td>{item.Designation}</td>
                                         <td>{new Date(item.Date).toLocaleDateString("es-CL")}</td>
-                                        <td>{item.Status}</td>
-                                        {/* <td>{item.mode}</td> */}
+                                        <td>{item.Status}{" "}
+                                            {item.Status === "Pending" && (
+                                                <button className="btn-three" onClick={() => handleDelete(modeData)}>DELETE</button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -208,7 +227,17 @@ function ShowAttendance() {
                     <div id="searching">
                         <div id="together_one">
                             <label htmlFor="empid">Emp ID</label>
-                            <input id="empNo" type="text" placeholder="1234" name="userName" onWheel={e => { e.target.blur() }} onKeyUp={Autopick} onChange={handleSearchChange} value={searchQuery}></input>
+                            {/* <Autocomplete
+                                id="empNo"
+                                options={info}
+                                getOptionLabel={(employee) => `${employee.EmpID}-${employee.First_Name} ${employee.Last_Name}`}
+                                renderInput={(params) => <TextField {...params} label="Employee" />}
+                                onChange={(event, newValue) => handleEmployeeSelect(newValue)}
+                                ListboxComponent={({ children }) => (
+                                    <Paper style={{ backgroundColor: "wheat" }}>{children}</Paper>
+                                  )}
+                            /> */}
+                            <input id="empNo" type="text" placeholder="1234" name="userName" onWheel={e => { e.target.blur() }} onChange={(e) => handleSearchChange(e.target.value)} value={searchQuery}></input>
                             {filteredEmployees.length > 0 && (
                                 <ul ref={ref_lists_frame} id="atcelement1">
                                     {filteredEmployees.map((employee, index) => (
@@ -233,11 +262,17 @@ function ShowAttendance() {
                         </div>
                         <label htmlFor="mode">Attendance type</label>
                         <select id="empMode" onChange={(e) => setMode(e.target.value)} value={mode}>
-                            <option value="0">ALL</option>
+                            <option value="">ALL</option>
                             <option value="1">WFH</option>
                             <option value="2">WFO</option>
                             <option value="3">HYBRID</option>
                             <option value="4">LEAVE</option>
+                        </select>
+                        <label htmlFor="status">Status type</label>
+                        <select id="empMode" onChange={(e) => setStatus(e.target.value)} value={status}>
+                            <option value="">ALL</option>
+                            <option value="Accept">ACCEPT</option>
+                            <option value="Pending">PENDING</option>
                         </select>
                     </div>
                     <div id="buttons">

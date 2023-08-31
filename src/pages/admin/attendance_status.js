@@ -18,6 +18,12 @@ function Attendance_status() {
     const [userData, setUserData] = useState([]);
     const [status, setStatus] = useState("Pending");
     const ref_dashboard = useRef(null);
+    const modeMap = {
+        1: "Remote",
+        2: "In-office",
+        3: "Hybird",
+        4: "Leave"
+    };
 
     function handleAxiosError(error) {
         if (error.response) {
@@ -93,27 +99,53 @@ function Attendance_status() {
         }
 
         btn1.onclick = function () {
-            const currentMode = dataitems.mode;
-            let attendanceStatus;
-            if (currentMode < 4) {
-                attendanceStatus = "Not-approve";
-            } else {
-                attendanceStatus = "Not-approve";
-            }
-            Axios.post("http://localhost:3000/attendance_status_update/", {
+            Axios.post('http://localhost:3000/delete_record/', {
                 empid: dataitems.EmpID,
+                empname: dataitems.EmpName,
                 date: moment(new Date(dataitems.Date)).format("YYYY-MM-DD"),
-                status_update: "Decline",
-                attendance_status: attendanceStatus
-            }).then(response => {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then((response) => {
                 modal.style.display = "none";
                 window.location.reload(false);
-            }).catch(handleAxiosError);
+            }).catch(handleAxiosError)
         }
 
         btn2.onclick = function () {
             modal.style.display = "none";
         }
+        // const modal = ref_declineStatus.current;
+        // const btn1 = ref_declineStatus_decline.current;
+        // const btn2 = ref_declineStatus_wait_decline.current;
+        // const span = ref_declineStatus_close3.current;
+        // modal.style.display = "block";
+        // span.onclick = function () {
+        //     modal.style.display = "none";
+        // }
+
+        // btn1.onclick = function () {
+        //     const currentMode = dataitems.mode;
+        //     let attendanceStatus;
+        //     if (currentMode < 4) {
+        //         attendanceStatus = "Not-approve";
+        //     } else {
+        //         attendanceStatus = "Not-approve";
+        //     }
+        //     Axios.post("http://localhost:3000/attendance_status_update/", {
+        //         empid: dataitems.EmpID,
+        //         date: moment(new Date(dataitems.Date)).format("YYYY-MM-DD"),
+        //         status_update: "Decline",
+        //         attendance_status: attendanceStatus
+        //     }).then(response => {
+        //         modal.style.display = "none";
+        //         window.location.reload(false);
+        //     }).catch(handleAxiosError);
+        // }
+
+        // btn2.onclick = function () {
+        //     modal.style.display = "none";
+        // }
     }
 
     return (
@@ -131,7 +163,7 @@ function Attendance_status() {
                 <div ref={ref_declineStatus} className="modal">
                     <div className="modal-content">
                         <span ref={ref_declineStatus_close3} className="close">&times;</span>
-                        <p>Are you sure to reject this!</p>
+                        <p>Are you sure to reject and delete this!</p>
                         <button ref={ref_declineStatus_decline} id="decline" className="button_hide">DECLINE</button>
                         <button ref={ref_declineStatus_wait_decline} id="wait_decline" className="button_next">CLOSE</button>
                     </div>
@@ -162,7 +194,7 @@ function Attendance_status() {
                                                 <td>{userItem.Designation}</td>
                                                 <td>{new Date(userItem.Date).toLocaleDateString("es-CL")}</td>
                                                 <td>{userItem.Status}</td>
-                                                <td>{userItem.mode}</td>
+                                                <td>{modeMap[userItem.mode]}</td>
                                                 <td>
                                                     <button className="button_hide" onClick={() => { Accept(userItem) }}><i className="move_icon fa fa-check"></i></button>
                                                     <button className="button_next" onClick={() => { Decline(userItem) }}><i className="move_icon fa fa-close"></i></button>

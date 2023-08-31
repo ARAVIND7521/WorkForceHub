@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom";
+import moment from "moment";
 import Axios from 'axios';
 import { useEffect } from 'react';
 import { Accordion } from 'react-bootstrap';
@@ -14,7 +14,8 @@ function ShowAttendance_emp() {
     const [name, setName] = useState("");
     const [dateFrom, setDateFrom] = useState(new Date().toISOString().substr(0, 8) + "01");
     const [dateTo, setDateTo] = useState(new Date().toISOString().substr(0, 10));
-    const [mode, setMode] = useState(0);
+    const [mode, setMode] = useState("");
+    const [status, setStatus] = useState("");
     const [empid, setEmpid] = useState("");
     const [errorMessages, setErrorMessages] = useState({});
     const ref_dashboard = useRef(null);
@@ -61,10 +62,12 @@ function ShowAttendance_emp() {
         if (dateFrom == "" || dateTo == "") {
             setErrorMessages({ name: "name", message: errors.input });
         } else {
-            if (mode == 0) {
+            if (mode) {
                 Axios.post('http://localhost:3000/show-all-attendance/', {
                     empid: empid,
                     empname: name,
+                    mode: mode,
+                    status: status,
                     datefrom: dateFrom,
                     dateto: dateTo,
                     headers: {
@@ -77,10 +80,10 @@ function ShowAttendance_emp() {
                     setErrorMessages({ name: "null", message: errors.null });
                 }).catch(handleAxiosError)
             } else {
-                Axios.post('http://localhost:3000/show_attendance/', {
+                Axios.post('http://localhost:3000/show-all-attendance/', {
                     empid: empid,
                     empname: name,
-                    mode: mode,
+                    status: status,
                     datefrom: dateFrom,
                     dateto: dateTo,
                     headers: {
@@ -129,6 +132,20 @@ function ShowAttendance_emp() {
         })).catch(handleAxiosError)
     }, []);
 
+    function handleDelete(modeData) {
+        Axios.post('http://localhost:3000/delete_record/', {
+            empid: empid,
+            empname: name,
+            date: moment(modeData[0].Date).format("YYYY-MM-DD"),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then((response) => {
+            search();
+        }).catch(handleAxiosError)
+    };
+
+
     const handleModeSelection = () => {
         setDataVisible(!isDataVisible);
     };
@@ -150,7 +167,6 @@ function ShowAttendance_emp() {
                                     <th>DESIGNATION</th>
                                     <th>DATE</th>
                                     <th>Status</th>
-                                    {/* <th>MODE</th> */}
                                 </tr>
                             </tbody>
                             <tbody>
@@ -160,8 +176,11 @@ function ShowAttendance_emp() {
                                         <td>{item.EmpName}</td>
                                         <td>{item.Designation}</td>
                                         <td>{new Date(item.Date).toLocaleDateString("es-CL")}</td>
-                                        <td>{item.Status}</td>
-                                        {/* <td>{item.mode}</td> */}
+                                        <td>{item.Status}{" "}
+                                            {item.Status === "Pending" && (
+                                                <button className="btn-three" onClick={() => handleDelete(modeData)}>DELETE</button>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -195,11 +214,17 @@ function ShowAttendance_emp() {
                         </div>
                         <label htmlFor="mode">Attendance type</label>
                         <select id="empMode" onChange={(e) => setMode(e.target.value)} value={mode}>
-                            <option value="0">ALL</option>
+                            <option value="">ALL</option>
                             <option value="1">WFH</option>
                             <option value="2">WFO</option>
                             <option value="3">HYBRID</option>
                             <option value="4">LEAVE</option>
+                        </select>
+                        <label htmlFor="status">Status type</label>
+                        <select id="empMode" onChange={(e) => setStatus(e.target.value)} value={status}>
+                            <option value="">ALL</option>
+                            <option value="Accept">ACCEPT</option>
+                            <option value="Pending">PENDING</option>
                         </select>
                     </div>
                     <div id="buttons">

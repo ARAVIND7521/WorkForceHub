@@ -57,6 +57,12 @@
     margin-top: 0px;
 }
 
+.btn-three {
+    width: auto;
+    height: auto;
+    margin-top: 0px;
+}
+
 .show {
     opacity: 1;
 }
@@ -1403,6 +1409,7 @@ input[type="number"]::-webkit-inner-spin-button {
 }
 
 #employeeCount {
+    cursor: pointer;
     margin-top: 20px;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -1802,8 +1809,8 @@ nav a:hover {
     width: 15%;
     background-color: #ffffff;
     position: absolute;
-    top: 311px;
-    left: 99px;
+    top: 320px;
+    left: 88px;
     z-index: 1;
 }
 
@@ -2066,3 +2073,83 @@ nav a:hover {
 .accordion-header.active .accordion-icon {
     transform: rotate(180deg);
 }
+
+/* This is a basic example of how you could style your component. */
+
+.attendance-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .attendance-title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .input-label {
+    font-weight: bold;
+  }
+  
+  .input-field {
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .autocomplete-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 10;
+  }
+  
+  .autocomplete-item {
+    padding: 8px;
+    cursor: pointer;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .search-button,
+  .reset-button {
+    padding: 8px 16px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .search-button:hover,
+  .reset-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .sc-gEvEer {
+    display: block !important;
+    background-color: white;
+  }

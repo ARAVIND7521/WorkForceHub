@@ -136,7 +136,12 @@ function Info() {
         cancel.style.display = "inline-block";
     }
 
-    function AgeCalculator() {
+    function handleDOBChange(newDOB) {
+        setDOB(newDOB);
+        AgeCalculator(newDOB);
+    }
+
+    function AgeCalculator(DOB) {
         let dob = new Date(DOB);
         let month_diff = Date.now() - dob.getTime();
         let age_dt = new Date(month_diff);
@@ -360,7 +365,7 @@ function Info() {
                     </div>
                     <div id='name'>
                         <label htmlFor="dob">DOB</label>
-                        <input disabled ref={ref_dob} id="dob" className="form" type="date" onInput={AgeCalculator} onChange={(e) => setDOB(e.target.value)} value={DOB} name="dob" placeholder="DD-MM-YYYY"></input>
+                        <input disabled ref={ref_dob} id="dob" className="form" type="date" onChange={(e) => handleDOBChange(e.target.value)} value={DOB} name="dob" placeholder="DD-MM-YYYY"></input>
                     </div>
                     {renderErrorMessage("DOB")}
                     <div id='name'>

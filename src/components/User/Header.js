@@ -108,7 +108,7 @@ const HeaderUser = React.memo(() => {
                                 <a ref={ref_pass_display} className="btn1 fa fa-user" id="display1" onClick={ChangePassword}> Change Password</a>
                             </li>
                             <li className="submenu">
-                                <a ref={ref_logout_display} className="btn fa fa-sign-out" id="display" onClick={(Logout)}>logout</a>
+                                <a ref={ref_logout_display} className="btn1 fa fa-sign-out" id="display" onClick={(Logout)}>logout</a>
                             </li>
                         </nav>
                     </div>
