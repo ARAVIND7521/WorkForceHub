@@ -59,6 +59,7 @@ function Attendance() {
         CURRENT_PASSWORD: "ENTER CURRENT PASSWORD!",
         NEW_PASSWORD_LENGTH: "ENTER THE VALID USERNAME AND MINIMUM 8 CHARACTER INCLUDE NUMNBER AND SPECIAL CHAR(*,&,...)",
         NULL: "",
+        DATA_PICK: "PICK ANY ONE",
         empID: "NO RECORD FOUND!",
         name: "INVALID DATA",
         date: "ENTER THE DATE",
@@ -189,6 +190,7 @@ function Attendance() {
     }
 
     function Insert() {
+        const filteList = ref_lists_frame.current;
         if (task == "") {
             element = ref_task.current.focus();
             setErrorMessages({ name: "task", message: errors.taskBar });
@@ -204,6 +206,9 @@ function Attendance() {
         } else if (empId === "") {
             element = ref_empid.current.focus();
             setErrorMessages({ name: "EmpName", message: errors.empID });
+        } else if (filteList.style.display === "flex") {
+            element = ref_empid.current.focus();
+            setErrorMessages({ name: "EmpName", message: errors.DATA_PICK });
         } else if (empId != "" && searchQuery != "" && Designation != "" && task != "" && mode != "" && date != "") {
             if (myyear == max && (mymonth == min + 1 || mymonth == min)) {
                 Axios.post('http://localhost:3000/dashboard/', {
