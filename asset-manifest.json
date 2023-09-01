@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/workForceHub/static/css/main.a7670016.css",
-    "main.js": "/workForceHub/static/js/main.0f229547.js",
+    "main.js": "/workForceHub/static/js/main.b1a77e95.js",
     "index.html": "/workForceHub/index.html",
     "main.a7670016.css.map": "/workForceHub/static/css/main.a7670016.css.map",
-    "main.0f229547.js.map": "/workForceHub/static/js/main.0f229547.js.map"
+    "main.b1a77e95.js.map": "/workForceHub/static/js/main.b1a77e95.js.map"
   },
   "entrypoints": [
     "static/css/main.a7670016.css",
-    "static/js/main.0f229547.js"
+    "static/js/main.b1a77e95.js"
   ]
 }
